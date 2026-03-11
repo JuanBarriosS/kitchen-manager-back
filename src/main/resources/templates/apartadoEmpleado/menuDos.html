@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Menú</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+    <div th:fragment="contenido"  class="contenido">
+        <h2>Editar Menú</h2>
+        <form th:action="@{/guardarMenuDos}" th:object="${menu}" method="post">
+            <label>Nombre del Plato:</label>
+            <input type="text" th:field="*{nombre}" /><br><br>
+
+            <label>Descripción:</label>
+            <textarea th:field="*{descripcion}"></textarea><br><br>
+
+            <label>Precio:</label>
+            <input type="number" step="0.01" th:field="*{precio}" /><br><br>
+
+            <button type="submit" class="boton-secundario">Guardar</button>
+            <a href="/empleado" style="margin-left: 10px; font-weight: bold; color: #911111;">Volver al menú</a>
+
+
+        </form>
+    </div>
+</body>
+
+</html>

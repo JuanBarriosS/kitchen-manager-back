@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .factura {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .cliente {
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .fecha {
+            text-align: right;
+            margin-bottom: 15px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="factura">
+        <div class="header">
+            <h1>Restaurante Delicioso</h1>
+            <h2>Factura</h2>
+        </div>
+        
+        <div class="fecha" th:text="'Fecha: ' + ${pedido.fecha}"></div>
+        
+        <div class="cliente">
+            <p><strong>Cliente:</strong> <span th:text="${pedido.nombreCliente}"></span></p>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Ítem</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${pedido.itemsSeleccionados}">
+                    <td th:text="${item.nombre}"></td>
+                    <td th:text="${item.descripcion}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(item.precio, 1, 2)}"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="total">
+            <p>Total: <span th:text="${'$' + #numbers.formatDecimal(total, 1, 2)}"></span></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p>¡Gracias por su compra!</p>
+            <a href="/verPedidos" class="btn btn-primary">Volver al menú</a>
+        </div>
+    </div>
+</body>
+</html>

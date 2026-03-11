@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ventas</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 40px;
+        }
+
+        h2 {
+            color: #911111;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .venta {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        li {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .volver-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 24px;
+            background-color: #911111;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .volver-btn:hover {
+            background-color:#911111;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido" class="contenido">
+        <h2>Ventas Realizadas</h2>
+
+        <div th:each="venta : ${ventas}" class="venta">
+            <p><strong>Cliente:</strong> <span th:text="${venta.nombreCliente}"></span></p>
+            <p><strong>Fecha:</strong> <span th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy HH:mm')}"></span></p>
+            <p><strong>Platos:</strong></p>
+            <ul>
+                <li th:each="plato : ${venta.itemsVendidos}" th:text="${plato.nombre + ' - $' + plato.precio}"></li>
+            </ul>
+            <p><strong>Total:</strong> <span th:text="${totales[venta.id]} + ' $'"></span></p>
+            <p>-----------------------------------------------------------------------</p>
+</div>
+        </div>
+
+        <a href="/admin" class="volver-btn">Volver al menu</a>
+        <br>
+        <form action="/eliminarTodasLasVentas" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar todas las ventas?');">
+            <button type="submit" class="volver-btn" style="background-color: #cc0000;">Eliminar todas las ventas</button>
+        </form>
+    </div>
+</body>
+</html>

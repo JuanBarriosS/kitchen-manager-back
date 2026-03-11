@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador | La Casa del Sabor</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <header class="barraSuperior">
+        <h2>Panel de Administración — La Casa del Sabor</h2>
+        <nav>
+            <a href="/admin">Inicio</a>
+            <a href="/menu">Editar Menú</a>
+            <a href="/verMenu">Ver Menú</a>
+            <a href="/verVentas">Ventas</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Cerrar sesión</a>
+        </nav>
+    </header>
+
+    <main class="content">
+        <div th:if="${contenido == 'inicio'}" class="contenido">
+            <h1>Bienvenido al Panel de Administración</h1>
+            <p style="text-align:center;">Desde aquí puedes gestionar tu menú, revisar las ventas y configurar tu restaurante.</p>
+        </div>
+
+        <div th:if="${contenido == 'verMenu'}">
+            <div th:replace="apartadoAdmin/verMenu :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'menu'}">
+            <div th:replace="apartadoAdmin/menu :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'dashboard'}">
+            <div th:replace="apartadoAdmin/dashboard :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'verVentas'}">
+            <div th:replace="apartadoAdmin/verVentas :: contenido"></div>
+        </div>
+    </main>
+</body>
+</html>

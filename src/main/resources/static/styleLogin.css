@@ -1,0 +1,90 @@
+/* --- LOGIN MODERNO OSCURO --- */
+
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top left, #0d1b1e 0%, #081012 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #e0e0e0;
+}
+
+/* Título */
+.titulo {
+    font-size: 2.2em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #e8f1f0;
+    letter-spacing: 1px;
+    text-shadow: none;
+}
+
+/* Contenedor del login */
+.container {
+    background: rgba(20, 30, 32, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px 35px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    width: 340px;
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Campos de texto */
+input {
+    display: block;
+    margin: 15px auto;
+    padding: 12px;
+    width: 90%;
+    border: 1px solid #2c3a3d;
+    border-radius: 10px;
+    background: #101c1f;
+    color: #e0e0e0;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+input:focus {
+    border-color: #1f8f83;
+    background: #142527;
+}
+
+/* Botón */
+button {
+    padding: 12px 20px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #1f8f83, #135b52);
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #24a394, #187063);
+    box-shadow: 0 0 10px rgba(31, 143, 131, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Animación sutil al cargar */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container, .titulo {
+    animation: fadeIn 0.8s ease forwards;
+}

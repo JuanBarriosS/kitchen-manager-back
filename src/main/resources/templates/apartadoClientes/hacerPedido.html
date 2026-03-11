@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Realizar Pedido</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e6f0f3;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #911111;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #911111;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 900px;
+            margin: auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background-color: #911111;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #911111;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #b31e1e;
+        }
+
+        a {
+            margin-left: 15px;
+            color: #911111;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="contenido" class="contenido">
+    <h1 style="color: #119180; text-align: center;">LA CASA DEL SABOR</h1>
+    <h2 style="color: #119180; text-align: center;">Realizar Pedido</h2>
+    <form action="/guardarPedido" method="post" onsubmit="return confirmarEnvio()">
+        <label>Nombre del Cliente:</label>
+        <input type="text" name="nombreCliente" required>
+        <label>ID del Cliente:</label>
+        <input type="number" name="clienteId" required>
+
+        <table>
+            <tr>
+                <th>Plato</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+            </tr>
+            <tr th:each="menu : ${menus}">
+                <td>
+                    <input type="checkbox" name="menuIds" th:value="${menu.id}" />
+                    <span th:text="${menu.nombre}"></span>
+                </td>
+                <td th:text="${menu.descripcion}"></td>
+                <td th:text="${menu.precio}"></td>
+                <td><input type="number" th:name="'cantidad_' + ${menu.id}" value="0" min="0" /></td>
+            </tr>
+        </table>
+        <br>
+        <div style="text-align: center;">
+            <button type="submit">Enviar Pedido</button>
+            <a href="/cliente" style="margin-left: 10px; font-weight: bold; color: #119180;">Volver</a>
+        </div>
+    </form>
+    <script>
+        function confirmarEnvio() {
+            return confirm("¿Deseas confirmar el pedido?");
+        }
+    </script>
+
+    </div>
+
+</body>
+</html>

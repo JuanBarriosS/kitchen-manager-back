@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleado</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <div class="barraSuperior">
+        <h2>Panel de Empleado - La Casa del Sabor</h2>
+        <nav>
+            <a href="/empleado">Inicio</a>
+            <a href="/menuDos">Editar menú del día</a>
+            <a href="/verMenuDos">Ver Menú</a>
+            <a href="/verPedidos">Ver comandas</a>
+            <a href="/logout">Cerrar sesión</a>
+
+        </nav>
+    </div>
+
+    <div class="content">
+        <div th:if="${contenido == 'menu'}">
+            <div th:replace="apartadoAdmin/menu :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'verMenuDos'}">
+            <div th:replace="apartadoEmpleado/verMenuDos :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'verPedidos'}">
+            <div th:replace="apartadoEmpleado/verPedidos :: contenido"></div>
+        </div>
+
+        <div th:unless="${contenido}">
+            <h1>  </h1>
+        </div>
+    </div>
+</body>
+</html>
