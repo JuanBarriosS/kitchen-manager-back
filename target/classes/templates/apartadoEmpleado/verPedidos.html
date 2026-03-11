@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pedidos Realizados</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #911111;
+            text-align: center;
+        }
+
+        .pedido {
+            background-color: #fefefe;
+            border: 1px solid #ddd;
+            border-left: 6px solid #911111;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .pedido:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: white;
+            background-color: #911111;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        a:hover {
+            background-color: #700d0d;
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #43a047;
+        }
+
+        .no-pedidos {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+    </style>
+    
+</head>
+<body>
+    
+
+    <div th:fragment="contenido" class="contenido">
+        <div class="container">
+            <h1>LA CASA DEL SABOR</h1>
+            <h2>Lista de Pedidos</h2>
+
+            <div th:if="${pedidos.empty}" class="no-pedidos">
+                <p>No hay pedidos registrados.</p>
+            </div>
+
+            <div th:each="pedido : ${pedidos}" class="pedido">
+                <p><strong>Pedido #:</strong> <span th:text="${pedido.id}"></span></p>
+                <p><strong>ID del Cliente:</strong> <span th:text="${pedido.clienteId}"></span></p>
+                <p><strong>Cliente:</strong> <span th:text="${pedido.nombreCliente}"></span></p>
+                <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p><strong>Platos:</strong></p>
+                <ul>
+                    <li th:each="plato : ${pedido.itemsSeleccionados}" th:text="${plato.nombre} + ' - $' + ${plato.precio}"></li>
+                </ul>
+                <p>----------------------------------------------------------------------------------</p>
+            </div>
+
+            <a href="/empleado">← Volver al menú</a>
+
+            <form action="/sacarPedido" method="post" onsubmit="return confirmarEnvio()">
+                <button type="submit">Sacar pedido</button>
+            </form>
+        </div>
+        <script>
+            function confirmar() {
+                return confirm("¿Deseas confirmar que ya salió el pedido?");
+            }
+        </script>
+    </div>
+</body>
+</html>

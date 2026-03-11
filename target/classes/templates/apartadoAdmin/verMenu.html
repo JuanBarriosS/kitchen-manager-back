@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Menú Actual</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+    <div th:if="${error}" class="alert alert-danger" id="errorDiv" style="display:none;">
+        <p th:text="${error}" id="errorText"></p>
+    </div>
+
+    <script th:if="${error}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorDiv = document.getElementById('errorDiv');
+            const errorText = document.getElementById('errorText').innerText;
+            alert(errorText);
+            errorDiv.style.display = 'none'; // para que el div no se vea en la página
+        });
+    </script>
+    <div th:fragment="contenido" class="contenido">
+        <h2>Menú Disponible</h2>
+
+        <table border="1">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Acciones</th> 
+            </tr>
+            <tr th:each="menu : ${menus}">
+                <td th:text="${menu.nombre}"></td>
+                <td th:text="${menu.descripcion}"></td>
+                <td th:text="${menu.precio}"></td>
+                <td>
+                    <!-- Botón para eliminar platillo individual -->
+                    <form th:action="@{/eliminarPlatillo/{id}(id=${menu.id})}" method="post" 
+                        onsubmit="return confirm('¿Eliminar este platillo?')">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <a href="/menu">Agregar nuevo plato</a>
+        <br>
+        <a href="/admin">Volver</a>
+        </div>
+    
+</body>
+</html>

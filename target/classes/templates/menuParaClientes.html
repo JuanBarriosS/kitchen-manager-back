@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+    <div class="barraSuperior">
+        <h2>INTERFAZ DE PEDIDOS</h2>
+        <nav>
+            <a href="/verMenuTres">Ver Menú</a>
+            <a href="/hacerPedido">Realizar orden</a>
+            <a href="/">Salir</a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div th:if="${contenido == 'verMenuTres'}">
+            <div th:replace="apartadoClientes/verMenuTres :: contenido"></div>
+        </div>
+
+        <div th:if="${contenido == 'hacerPedido'}">
+            <div th:replace="apartadoClientes/hacerPedido :: contenido"></div>
+        </div>
+
+        <div th:unless="${contenido}">
+            <h1>Bienvenido al sistema de pedidos</h1>
+        </div>
+    </div>
+</body>
+</html>

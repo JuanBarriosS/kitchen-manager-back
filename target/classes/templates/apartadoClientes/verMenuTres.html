@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Menú Actual</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div th:fragment="contenido" class="contenido">
+        <h2 style="color: #119180; text-align: center;">Menú Disponible</h2>
+        
+        <table border="1">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+            </tr>
+            <tr th:each="menu : ${menus}">
+                <td th:text="${menu.nombre}"></td>
+                <td th:text="${menu.descripcion}"></td>
+                <td th:text="${menu.precio}"></td>
+            </tr>
+        </table>
+
+        <br>
+        <div style="text-align: center;">
+            <a href="/cliente" style="margin-left: 10px; font-weight: bold; color: #119180;">Volver</a>
+        </div>
+        </div>
+</body>
+</html>
