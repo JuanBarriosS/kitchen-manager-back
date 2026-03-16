@@ -63,16 +63,16 @@ public class DemoController {
                 )
             );
 
-            // 2. Si llegamos aquí, los datos son correctos. Buscamos al usuario para generar su token.
+            // Si los datos son correctos s busca al usuario para generar su token.
             Usuarios usuario = usuarioRepository.findByUsername(loginRequest.getUsername());
             
-            // 3. Generar el Token JWT usando nuestro JwtService
+            // generar el Token JWT usando JwtService
             String jwt = jwtService.generateToken(usuario);
 
-            // 4. Preparar respuesta para el frontend (React)
+            // respuesta para el frontend React
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Login exitoso");
-            respuesta.put("token", jwt); // <--- ESTO ES LO MÁS IMPORTANTE
+            respuesta.put("token", jwt); // token 
             respuesta.put("usuario", usuario.getUsername());
             respuesta.put("roles", usuario.getRoles());
 
@@ -200,4 +200,8 @@ public class DemoController {
         return ResponseEntity.ok("Usuario eliminado");
     }
     
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> dashboard() {
+        return ResponseEntity.ok(true);
+    }
 }

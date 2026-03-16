@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Document(collection = "usuarios")
-public class Usuarios implements UserDetails { // <--- 1. Implementamos UserDetails
+public class Usuarios implements UserDetails { // Implementamr UserDetails
 
     @Id
     private String id;
@@ -23,8 +23,8 @@ public class Usuarios implements UserDetails { // <--- 1. Implementamos UserDeta
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 2. Convertimos tu lista de Strings en objetos que Spring Security entiende.
-        // Importante: Spring espera que los roles empiecen con "ROLE_" para usar .hasRole()
+        //  Convertir lista de Strings en objetos que Spring Security entiende
+        // Spring espera que los roles empiecen con ROLE_ para poder usar el .hasRole()
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
@@ -40,7 +40,6 @@ public class Usuarios implements UserDetails { // <--- 1. Implementamos UserDeta
         return username;
     }
 
-    // 3. Flags de estado de la cuenta (por ahora los ponemos todos en true)
     @Override
     public boolean isAccountNonExpired() {
         return true; 
