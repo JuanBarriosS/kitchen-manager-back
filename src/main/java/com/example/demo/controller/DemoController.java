@@ -204,4 +204,18 @@ public class DemoController {
     public ResponseEntity<?> dashboard() {
         return ResponseEntity.ok(true);
     }
+
+    @GetMapping("/clientes/verMenu")
+    public ResponseEntity<?> obtenerProductosIII() {
+        return ResponseEntity.ok(menuRepository.findAll());
+    }
+
+    @PostMapping("/clientes/registrarPedido")
+    public ResponseEntity<?> registrarPedidoII(@RequestBody Pedido pedido) {
+        pedido.setFecha(LocalDateTime.now());
+        pedidoRepository.save(pedido);
+        return ResponseEntity.ok("Pedido registrado");
+    }
+
+
 }
