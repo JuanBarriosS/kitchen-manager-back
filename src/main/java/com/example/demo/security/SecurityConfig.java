@@ -71,7 +71,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             return config;
         }))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/login, /dashboard", "/cientes/**").permitAll()
+            .requestMatchers("/login", "/dashboard", "/cientes/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
             .anyRequest().authenticated()
