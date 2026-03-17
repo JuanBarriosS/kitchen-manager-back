@@ -33,7 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173",
+    "https://kitchen-manager-front.vercel.app"})
 
 public class DemoController {
 

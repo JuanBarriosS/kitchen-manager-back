@@ -3,9 +3,8 @@ package com.example.demo.security;
 import com.example.demo.model.Usuarios;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.service.UserDetailsServiceImpl;
-
+import org.springframework.http.HttpMethod;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -71,6 +70,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             return config;
         }))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/login", "/dashboard", "/cientes/**").permitAll()
             .requestMatchers("/admin/**").hasRole("ADMIN")
             .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
