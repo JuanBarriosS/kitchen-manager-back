@@ -218,5 +218,9 @@ public class DemoController {
         return ResponseEntity.ok("Pedido registrado");
     }
 
+    @GetMapping("/cocina/pedidos")
+    public ResponseEntity<?> obtenerPedidosCocina() {
+        return ResponseEntity.ok(pedidoRepository.findAll());
+    }
 
 }
