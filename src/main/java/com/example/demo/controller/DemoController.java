@@ -223,4 +223,11 @@ public class DemoController {
         return ResponseEntity.ok(pedidoRepository.findAll());
     }
 
+    @GetMapping("/seguimiento/{id}")
+    public ResponseEntity<?> seguimientoPedido(@PathVariable String id) {
+        return pedidoRepository.findById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
 }
