@@ -123,7 +123,7 @@ public class DemoController {
     public ResponseEntity<?> registrarPedido(@RequestBody Pedido pedido) {
         pedido.setFecha(LocalDateTime.now());
         pedidoRepository.save(pedido);
-        return ResponseEntity.ok("Pedido registrado");
+        return ResponseEntity.ok(pedido);
     }
 
     @GetMapping("/admin/verPedidos")
