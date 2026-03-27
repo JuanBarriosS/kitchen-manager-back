@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Menu;
 import com.example.demo.model.Pedido;
+import com.example.demo.model.QrToken;
 import com.example.demo.model.Usuarios;
 import com.example.demo.model.Venta;
 import com.example.demo.repository.MenuRepository;
 import com.example.demo.repository.PedidoRepository;
+import com.example.demo.repository.QrTokenRepository;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.repository.VentaRepository;
 import com.example.demo.security.JwtService;
@@ -52,6 +54,8 @@ public class DemoController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private QrTokenRepository qrTokenRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuarios loginRequest) {
@@ -228,6 +232,59 @@ public class DemoController {
         return pedidoRepository.findById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/admin/qrs")
+    public ResponseEntity<?> obtenerQrs() {
+        return ResponseEntity.ok(qrTokenRepository.findAll());
+    }
+
+    @PostMapping("/admin/qrs")
+    public ResponseEntity<?> crearQr(@RequestBody QrToken qr) {
+        qr.setToken(java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+        qr.setActivo(true);
+        qrTokenRepository.save(qr);
+        return ResponseEntity.ok(qr);
+}
+
+    @PatchMapping("/admin/qrs/{id}/estado")
+    public ResponseEntity<?> toggleQr(@PathVariable String id, @RequestBody Map<String, Boolean> body) {
+        return qrTokenRepository.findById(id).map(qr -> {
+            qr.setActivo(body.get("activo"));
+            qrTokenRepository.save(qr);
+            return ResponseEntity.ok(qr);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/admin/qrs/{id}")
+    public ResponseEntity<?> eliminarQr(@PathVariable String id) {
+        qrTokenRepository.deleteById(id);
+        return ResponseEntity.ok("QR eliminado");
+    }
+
+    @GetMapping("/menu/{token}")
+    public ResponseEntity<?> menuPublico(@PathVariable String token) {
+        return qrTokenRepository.findByToken(token).map(qr -> {
+            if (!qr.isActivo()) {
+                return ResponseEntity.status(403).body((Object)"QR inactivo");
+            }
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("qr", qr);
+            resp.put("menu", menuRepository.findAll()
+                .stream().filter(m -> m.isDisponible()).toList());
+            return ResponseEntity.ok(resp);
+        }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
+    }
+
+    @PostMapping("/menu/{token}/pedido")
+    public ResponseEntity<?> pedidoDesdeQr(@PathVariable String token, @RequestBody Pedido pedido) {
+        return qrTokenRepository.findByToken(token).map(qr -> {
+            if (!qr.isActivo()) return ResponseEntity.status(403).body((Object)"QR inactivo");
+            pedido.setFecha(LocalDateTime.now());
+            pedido.setFuente(qr.getNombre());
+            pedidoRepository.save(pedido);
+            return ResponseEntity.ok((Object)pedido);
+        }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
     }
 
 }
