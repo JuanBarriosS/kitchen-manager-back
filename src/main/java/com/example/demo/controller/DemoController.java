@@ -281,7 +281,7 @@ public class DemoController {
         return qrTokenRepository.findByToken(token).map(qr -> {
             if (!qr.isActivo()) return ResponseEntity.status(403).body((Object)"QR inactivo");
             pedido.setFecha(LocalDateTime.now());
-            pedido.setFuente(qr.getNombre());
+            pedido.setFuente("Presencial");
             pedidoRepository.save(pedido);
             return ResponseEntity.ok((Object)pedido);
         }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
