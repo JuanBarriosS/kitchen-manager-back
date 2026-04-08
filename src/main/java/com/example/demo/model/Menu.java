@@ -20,13 +20,14 @@ public class Menu {
 
     private int cantidad;
 
+    private String imagenUrl;
 
     public Menu() {
     }
     
 
     public Menu(String id, String nombre, String categoria, String descripcion, double precio, boolean disponible,
-            int cantidad) {
+            int cantidad, String imagenUrl) {
         this.id = id;
         this.nombre = nombre;
         this.categoria = categoria;
@@ -34,6 +35,7 @@ public class Menu {
         this.precio = precio;
         this.disponible = disponible;
         this.cantidad = cantidad;
+        this.imagenUrl = imagenUrl;
     }
 
     public boolean isDisponible() {
@@ -91,4 +93,12 @@ public class Menu {
         this.id = id;
     }
     
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+
 }

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.Menu;
 import com.example.demo.model.Pedido;
@@ -22,11 +24,16 @@ import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.repository.VentaRepository;
 import com.example.demo.security.JwtService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -121,6 +128,19 @@ public class DemoController {
     public ResponseEntity<?> agregarProducto(@RequestBody Menu menu) {
         menuRepository.save(menu);
         return ResponseEntity.ok("Producto agregado correctamente");
+    }
+
+    @PostMapping(value = "/admin/menu/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> subirImagen(@PathVariable String id, @RequestParam MultipartFile imagen) throws IOException {
+        return menuRepository.findById(id).map(m -> {
+            try {
+                String nombreArchivo = UUID.randomUUID() + "_" + imagen.getOriginalFilename();
+                Files.createDirectories(Paths.get("uploads"));
+                imagen.transferTo(Paths.get("uploads", nombreArchivo));
+                m.setImagenUrl("/uploads/" + nombreArchivo);
+                return ResponseEntity.ok(menuRepository.save(m));
+            } catch (IOException e) { throw new RuntimeException(e); }
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/empleado/registrarPedido")
