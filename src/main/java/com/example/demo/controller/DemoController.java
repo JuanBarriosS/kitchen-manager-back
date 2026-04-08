@@ -126,8 +126,8 @@ public class DemoController {
 
     @PostMapping("/admin/agregarMenu")
     public ResponseEntity<?> agregarProducto(@RequestBody Menu menu) {
-        menuRepository.save(menu);
-        return ResponseEntity.ok("Producto agregado correctamente");
+        Menu savedMenu = menuRepository.save(menu);
+        return ResponseEntity.ok(savedMenu);
     }
 
     @PostMapping(value = "/admin/menu/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
