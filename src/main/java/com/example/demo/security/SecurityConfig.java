@@ -48,7 +48,11 @@ public class SecurityConfig {
             }))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+<<<<<<< HEAD
                 .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**", "/admin/menu/**/imagen").permitAll()
+=======
+                .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**").permitAll()
+>>>>>>> parent of e7558a6 (back)
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
                 .anyRequest().authenticated()
