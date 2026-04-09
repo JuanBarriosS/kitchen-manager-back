@@ -23,6 +23,7 @@ import com.example.demo.repository.QrTokenRepository;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.repository.VentaRepository;
 import com.example.demo.security.JwtService;
+import com.example.demo.service.ImageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,7 +64,9 @@ public class DemoController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private QrTokenRepository qrTokenRepository;
-
+    @Autowired
+    private ImageService imageService;
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuarios loginRequest) {
         try {
@@ -131,15 +134,15 @@ public class DemoController {
     }
 
     @PostMapping(value = "/admin/menu/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> subirImagen(@PathVariable String id, @RequestParam MultipartFile imagen) throws IOException {
+    public ResponseEntity<?> subirImagen(@PathVariable String id, @RequestParam MultipartFile imagen) {
         return menuRepository.findById(id).map(m -> {
             try {
-                String nombreArchivo = UUID.randomUUID() + "_" + imagen.getOriginalFilename();
-                Files.createDirectories(Paths.get("uploads"));
-                imagen.transferTo(Paths.get("uploads", nombreArchivo));
-                m.setImagenUrl("/uploads/" + nombreArchivo);
+                String url = imageService.uploadImage(imagen); // sube a Cloudinary
+                m.setImagenUrl(url); // guarda la URL https://res.cloudinary.com/...
                 return ResponseEntity.ok(menuRepository.save(m));
-            } catch (IOException e) { throw new RuntimeException(e); }
+            } catch (IOException e) {
+                return ResponseEntity.status(500).body((Object)("Error subiendo imagen: " + e.getMessage()));
+            }
         }).orElse(ResponseEntity.notFound().build());
     }
 
