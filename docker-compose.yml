@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  kitchen-manager-back:
+    image: kitchen-manager-back:latest
+    container_name: kitchen-manager-back
+    restart: always
+    network_mode: host
+    environment:
+      - TZ=America/Bogota
+    volumes:
+      - ./uploads:/app/uploads
+      - /etc/localtime:/etc/localtime:ro

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.example.demo.model.Menu;
 import com.example.demo.model.Pedido;
 import com.example.demo.model.QrToken;
@@ -23,18 +22,13 @@ import com.example.demo.repository.QrTokenRepository;
 import com.example.demo.repository.UsuarioRepository;
 import com.example.demo.repository.VentaRepository;
 import com.example.demo.security.JwtService;
-import com.example.demo.service.ImageService;
-
-import java.io.IOException;
+import java.nio.file.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -64,30 +58,28 @@ public class DemoController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private QrTokenRepository qrTokenRepository;
-    @Autowired
-    private ImageService imageService;
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuarios loginRequest) {
         try {
             // validarSpring Security automaticamente si el usuario existe y la contraseña coincide
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(), 
+                    loginRequest.getUsername(),
                     loginRequest.getPassword()
                 )
             );
 
             // Si los datos son correctos s busca al usuario para generar su token.
             Usuarios usuario = usuarioRepository.findByUsername(loginRequest.getUsername());
-            
+
             // generar el Token JWT usando JwtService
             String jwt = jwtService.generateToken(usuario);
 
             // respuesta para el frontend React
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Login exitoso");
-            respuesta.put("token", jwt); // token 
+            respuesta.put("token", jwt); // token
             respuesta.put("usuario", usuario.getUsername());
             respuesta.put("roles", usuario.getRoles());
 
@@ -110,7 +102,7 @@ public class DemoController {
 
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("mensaje", "Usuario registrado con éxito con contraseña encriptada");
-        return ResponseEntity.ok(respuesta);          
+        return ResponseEntity.ok(respuesta);
     }
 
     @GetMapping("/admin/verEmpleados")
@@ -133,19 +125,6 @@ public class DemoController {
         return ResponseEntity.ok(savedMenu);
     }
 
-    @PostMapping(value = "/admin/menu/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> subirImagen(@PathVariable String id, @RequestParam MultipartFile imagen) {
-        return menuRepository.findById(id).map(m -> {
-            try {
-                String url = imageService.uploadImage(imagen); // sube a Cloudinary
-                m.setImagenUrl(url); // guarda la URL https://res.cloudinary.com/...
-                return ResponseEntity.ok(menuRepository.save(m));
-            } catch (IOException e) {
-                return ResponseEntity.status(500).body((Object)("Error subiendo imagen: " + e.getMessage()));
-            }
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
     @PostMapping("/empleado/registrarPedido")
     public ResponseEntity<?> registrarPedido(@RequestBody Pedido pedido) {
         pedido.setFecha(LocalDateTime.now());
@@ -157,7 +136,7 @@ public class DemoController {
     public ResponseEntity<?> obtenerPedidos() {
         return ResponseEntity.ok(pedidoRepository.findAll());
     }
-    
+
     @GetMapping("/empleado/pedidos")
     public ResponseEntity<?> obtenerPedidosII() {
         return ResponseEntity.ok(pedidoRepository.findAll());
@@ -185,7 +164,7 @@ public class DemoController {
             venta.setPedidoId(pedidoId);
             venta.setNombreCliente(pedido.getNombreCliente());
             venta.setFuente(pedido.getFuente());
-            venta.setItemsVendidos(pedido.getItemsSeleccionados()); 
+            venta.setItemsVendidos(pedido.getItemsSeleccionados());
             venta.setTotal(pedido.getTotal());
             venta.setFecha(LocalDateTime.now());
             ventaRepository.save(venta);
@@ -227,7 +206,7 @@ public class DemoController {
         usuarioRepository.deleteById(id);
         return ResponseEntity.ok("Usuario eliminado");
     }
-    
+
     @GetMapping("/dashboard")
     public ResponseEntity<?> dashboard() {
         return ResponseEntity.ok(true);
@@ -268,7 +247,7 @@ public class DemoController {
         qr.setActivo(true);
         qrTokenRepository.save(qr);
         return ResponseEntity.ok(qr);
-}
+    }
 
     @PatchMapping("/admin/qrs/{id}/estado")
     public ResponseEntity<?> toggleQr(@PathVariable String id, @RequestBody Map<String, Boolean> body) {
@@ -308,6 +287,27 @@ public class DemoController {
             pedidoRepository.save(pedido);
             return ResponseEntity.ok((Object)pedido);
         }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
+    }
+
+    @PostMapping("/admin/upload")
+    public ResponseEntity<?> subirImagen(@RequestParam("file") MultipartFile file) {
+        try {
+            String carpeta = System.getProperty("user.home") + "/kitchen-images/";
+            Files.createDirectories(Paths.get(carpeta));
+
+            String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename()
+                .replaceAll("[^a-zA-Z0-9._-]", "_");
+
+            Path destino = Paths.get(carpeta + nombreArchivo);
+            Files.write(destino, file.getBytes());
+
+            Map<String, String> resp = new HashMap<>();
+            resp.put("url", "/imagenes/" + nombreArchivo);
+            return ResponseEntity.ok(resp);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al subir imagen");
+        }
     }
 
 }
