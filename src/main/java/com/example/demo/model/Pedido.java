@@ -25,6 +25,8 @@ public class Pedido {
 
     private float total;
 
+    private String notas;
+
     private String estado = "recibido";
 
     public Pedido() {
@@ -95,5 +97,12 @@ public class Pedido {
         this.clienteId = clienteId;
     }
 
+    public String getNotas() {
+    return notas;
+    }
+    
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
     
 }
