@@ -347,4 +347,9 @@ public class DemoController {
                 .map(m -> Map.of("id", m.getId(), "nombre", m.getUsername()))
                 .toList()
         );}
+
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("API is alive!");
+    }
 }
