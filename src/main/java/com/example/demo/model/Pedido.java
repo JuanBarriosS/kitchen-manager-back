@@ -29,6 +29,8 @@ public class Pedido {
 
     private String estado = "recibido";
 
+    private String meseroAsignado;
+
     public Pedido() {
     }
 
@@ -93,16 +95,20 @@ public class Pedido {
         return clienteId;
     }
 
-    public void setClienteId(Long clienteId) {
+    public void setClienteId(String notas) {
         this.clienteId = clienteId;
     }
 
     public String getNotas() {
-    return notas;
+        return notas;
     }
-    
+
     public void setNotas(String notas) {
         this.notas = notas;
     }
+
+    public String getMeseroAsignado() { return meseroAsignado; }
+    
+    public void setMeseroAsignado(String meseroAsignado) { this.meseroAsignado = meseroAsignado; }
     
 }
