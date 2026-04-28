@@ -16,7 +16,9 @@ import com.example.demo.model.Pedido;
 import com.example.demo.model.QrToken;
 import com.example.demo.model.Usuarios;
 import com.example.demo.model.Venta;
+import com.example.demo.model.Empleados;
 import com.example.demo.repository.MenuRepository;
+import com.example.demo.repository.EmpleadoRepository;
 import com.example.demo.repository.PedidoRepository;
 import com.example.demo.repository.QrTokenRepository;
 import com.example.demo.repository.UsuarioRepository;
@@ -50,6 +52,8 @@ public class DemoController {
     private MenuRepository menuRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -105,9 +109,29 @@ public class DemoController {
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/admin/verEmpleados")
+    @PostMapping("/admin/agregarEmpleado")
+    public ResponseEntity<?> agregarEmpleado(@RequestBody Empleados empleado) {
+        if (empleado == null) {
+            return ResponseEntity.status(400).body("Datos de empleados no válidos");
+        }
+        // encrptar la contraseña antes de guardar
+        String passwordEncriptada = passwordEncoder.encode(empleado.getPassword());
+        empleado.setPassword(passwordEncriptada);
+        empleadoRepository.save(empleado);
+
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("mensaje", "Empleadp registrado con éxito con contraseña encriptada");
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping("/admin/Usuarios")
     public ResponseEntity<?> obtenerEmpleados() {
         return ResponseEntity.ok(usuarioRepository.findAll());
+    }
+
+    @GetMapping("/admin/Meseros")
+    public ResponseEntity<?> obtenerMeseros() {
+        return ResponseEntity.ok(empleadoRepository.findAll());
     }
 
     @GetMapping("/admin/verMenu")
@@ -204,6 +228,12 @@ public class DemoController {
     @DeleteMapping("/admin/usuario/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable String id) {
         usuarioRepository.deleteById(id);
+        return ResponseEntity.ok("Usuario eliminado");
+    }
+
+    @DeleteMapping("/admin/empleado/{id}")
+    public ResponseEntity<?> eliminarEmpleado(@PathVariable String id) {
+        empleadoRepository.deleteById(id);
         return ResponseEntity.ok("Usuario eliminado");
     }
 
@@ -310,4 +340,11 @@ public class DemoController {
         }
     }
 
+    @GetMapping("/meseros/disponibles")
+    public ResponseEntity<?> meserosDisponibles() {
+        return ResponseEntity.ok(
+            empleadoRepository.findAll().stream()
+                .map(m -> Map.of("id", m.getId(), "nombre", m.getUsername()))
+                .toList()
+        );}
 }
