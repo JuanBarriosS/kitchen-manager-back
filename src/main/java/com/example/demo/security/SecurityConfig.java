@@ -49,7 +49,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/admin/menu/*/imagen").permitAll()
-                .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**", "/imagenes/**", "/meseros/disponibles", "/admin/Meseros", "/health").permitAll()
+                .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**", "/imagenes/**", "/meseros/disponibles", "/admin/Meseros", "/health",
+                "/empleado/pedidos", "/empleado/ventas").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
                 .anyRequest().authenticated()
