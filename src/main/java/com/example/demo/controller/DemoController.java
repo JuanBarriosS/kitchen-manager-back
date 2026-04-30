@@ -190,6 +190,7 @@ public class DemoController {
             venta.setFuente(pedido.getFuente());
             venta.setItemsVendidos(pedido.getItemsSeleccionados());
             venta.setTotal(pedido.getTotal());
+            venta.setMeseroAsignado(pedido.getMeseroAsignado());
             venta.setFecha(LocalDateTime.now());
             ventaRepository.save(venta);
             pedidoRepository.deleteById(pedidoId);
