@@ -16,6 +16,7 @@ public class Venta {
     private String fuente;
     private float total;
     private LocalDateTime fecha;
+    private String meseroAsignado;
 
     private List<Map<String, Object>> itemsVendidos;
 
@@ -41,4 +42,7 @@ public class Venta {
 
     public List<Map<String, Object>> getItemsVendidos() { return itemsVendidos; }
     public void setItemsVendidos(List<Map<String, Object>> itemsVendidos) { this.itemsVendidos = itemsVendidos; }
+
+    public String getMeseroAsignado() { return meseroAsignado; }
+    public void setMeseroAsignado(String meseroAsignado) { this.meseroAsignado = meseroAsignado; }
 }
