@@ -196,7 +196,7 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
             mesero = "No asignado";
         }
         venta.setMeseroAsignado(mesero);
-        venta.setFecha(LocalDateTime.now(ZoneId.of("America/Bogota")));
+        pedido.setFecha(LocalDateTime.now());
         ventaRepository.save(venta);
         pedidoRepository.deleteById(pedidoId);
         return ResponseEntity.ok(venta);
