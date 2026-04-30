@@ -182,21 +182,26 @@ public class DemoController {
     }
 
     @PostMapping("/empleado/facturar/{pedidoId}")
-    public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
-        return pedidoRepository.findById(pedidoId).map(pedido -> {
-            Venta venta = new Venta();
-            venta.setPedidoId(pedidoId);
-            venta.setNombreCliente(pedido.getNombreCliente());
-            venta.setFuente(pedido.getFuente());
-            venta.setItemsVendidos(pedido.getItemsSeleccionados());
-            venta.setTotal(pedido.getTotal());
-            venta.setMeseroAsignado(pedido.getMeseroAsignado());
-            venta.setFecha(LocalDateTime.now());
-            ventaRepository.save(venta);
-            pedidoRepository.deleteById(pedidoId);
-            return ResponseEntity.ok(venta);
-        }).orElse(ResponseEntity.notFound().build());
-    }
+public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
+    return pedidoRepository.findById(pedidoId).map(pedido -> {
+        Venta venta = new Venta();
+        venta.setPedidoId(pedidoId);
+        venta.setNombreCliente(pedido.getNombreCliente());
+        venta.setFuente(pedido.getFuente());
+        venta.setItemsVendidos(pedido.getItemsSeleccionados());
+        venta.setTotal(pedido.getTotal());
+
+        String mesero = pedido.getMeseroAsignado();
+        if (mesero == null || mesero.trim().isEmpty()) {
+            mesero = "No asignado";
+        }
+        venta.setMeseroAsignado(mesero);
+        venta.setFecha(LocalDateTime.now(ZoneId.of("America/Bogota")));
+        ventaRepository.save(venta);
+        pedidoRepository.deleteById(pedidoId);
+        return ResponseEntity.ok(venta);
+    }).orElse(ResponseEntity.notFound().build());
+}
 
     @GetMapping("/empleado/ventas")
     public ResponseEntity<?> verVentas() {
