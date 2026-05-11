@@ -358,4 +358,139 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
     public ResponseEntity<String> healthCheck() {
         return ResponseEntity.ok("API is alive!");
     }
+
+    @GetMapping("/admin/exportar-weka")
+    public ResponseEntity<?> exportarWeka(HttpServletResponse response) throws Exception {
+        response.setContentType("text/plain; charset=UTF-8");
+        response.setHeader("Content-Disposition",
+            "attachment; filename=ventas_kitchen.arff");
+    
+        List<Venta> ventas = ventaRepository.findAll();
+    
+        // ── PASO 1: recolectar platos únicos con sus frecuencias ──
+        Map<String, Integer> frecuenciaPlatos = new LinkedHashMap<>();
+        for (Venta v : ventas) {
+            if (v.getItemsVendidos() == null) continue;
+            for (Map<String, Object> item : v.getItemsVendidos()) {
+                Object nom = item.get("nombre");
+                if (nom == null) continue;
+                String plato = limpiar(nom.toString());
+                int cant = ((Number) item.getOrDefault("cantidad", 1)).intValue();
+                frecuenciaPlatos.merge(plato, cant, Integer::sum);
+            }
+        }
+    
+        if (frecuenciaPlatos.isEmpty()) {
+            response.getWriter().write("% No hay ventas registradas todavia");
+            return null;
+        }
+    
+        // Lista de platos únicos para declarar el atributo nominal
+        List<String> platosUnicos = new ArrayList<>(frecuenciaPlatos.keySet());
+    
+        // ── PASO 2: calcular umbrales baja/media/alta ──
+        // Recogemos TODAS las cantidades individuales para percentiles
+        List<Integer> cantidades = new ArrayList<>();
+        for (Venta v : ventas) {
+            if (v.getItemsVendidos() == null) continue;
+            for (Map<String, Object> item : v.getItemsVendidos()) {
+                int c = ((Number) item.getOrDefault("cantidad", 1)).intValue();
+                cantidades.add(c);
+            }
+        }
+        Collections.sort(cantidades);
+    
+        // percentil 33 y 66
+        int p33 = cantidades.get(Math.max(0, (int)(cantidades.size() * 0.33) - 1));
+        int p66 = cantidades.get(Math.max(0, (int)(cantidades.size() * 0.66) - 1));
+        // Si todos son iguales evitamos que todo sea la misma clase
+        if (p33 == p66) { p33 = 1; p66 = 2; }
+    
+        // ── PASO 3: construir cabecera ARFF ──
+        StringBuilder sb = new StringBuilder();
+        sb.append("@relation demanda_platos\n\n");
+    
+        // Atributo plato — nominal con los valores reales
+        sb.append("@attribute plato {");
+        sb.append(platosUnicos.stream()
+            .map(p -> "'" + p + "'")
+            .collect(Collectors.joining(",")));
+        sb.append("}\n");
+    
+        sb.append("@attribute dia_semana " +
+            "{Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo}\n");
+        sb.append("@attribute hora_dia " +
+            "{manana,mediodia,tarde,noche}\n");
+        sb.append("@attribute fuente " +
+            "{Presencial,Rappi,UberEats,WhatsApp,DiDiFood,Otro}\n");
+    
+        // Clase — lo que queremos predecir
+        sb.append("@attribute demanda {baja,media,alta}\n\n");
+        sb.append("@data\n");
+    
+        // ── PASO 4: generar filas de datos ──
+        String[] diasNombre = {
+            "Domingo","Lunes","Martes","Miercoles",
+            "Jueves","Viernes","Sabado"
+        };
+    
+        for (Venta v : ventas) {
+            if (v.getItemsVendidos() == null || v.getFecha() == null) continue;
+    
+            // extraer contexto temporal de esta venta
+            LocalDateTime fecha = v.getFecha();
+            String dia     = diasNombre[fecha.getDayOfWeek().getValue() % 7];
+            String horaDia = getHoraDia(fecha.getHour());
+            String fuente  = normalizarFuente(v.getFuente());
+    
+            for (Map<String, Object> item : v.getItemsVendidos()) {
+                Object nom = item.get("nombre");
+                if (nom == null) continue;
+    
+                String plato = limpiar(nom.toString());
+                if (!frecuenciaPlatos.containsKey(plato)) continue;
+    
+                int cantidad = ((Number) item.getOrDefault("cantidad", 1)).intValue();
+    
+                // clasificar cantidad en baja/media/alta
+                String demanda;
+                if      (cantidad <= p33) demanda = "baja";
+                else if (cantidad <= p66) demanda = "media";
+                else                      demanda = "alta";
+    
+                sb.append(String.format("'%s',%s,%s,%s,%s\n",
+                    plato, dia, horaDia, fuente, demanda));
+            }
+        }
+    
+        response.getWriter().write(sb.toString());
+        return null;
+    }
+    
+    // ── helpers ──
+    private String limpiar(String s) {
+        return s.trim()
+                .replace("'",  "")
+                .replace("\"", "")
+                .replace(",",  "");
+    }
+    
+    private String getHoraDia(int hora) {
+        if (hora >= 6  && hora < 12) return "manana";
+        if (hora >= 12 && hora < 15) return "mediodia";
+        if (hora >= 15 && hora < 20) return "tarde";
+        return "noche";
+    }
+    
+    private String normalizarFuente(String f) {
+        if (f == null) return "Otro";
+        switch (f.trim()) {
+            case "Rappi":      return "Rappi";
+            case "Uber Eats":  return "UberEats";
+            case "WhatsApp":   return "WhatsApp";
+            case "DiDi Food":  return "DiDiFood";
+            case "Presencial": return "Presencial";
+            default:           return "Otro";
+        }
+    }
 }
