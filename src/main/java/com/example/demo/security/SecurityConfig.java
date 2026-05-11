@@ -48,6 +48,7 @@ public class SecurityConfig {
             }))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/admin/exportar-weka").permitAll()                   
                 .requestMatchers(HttpMethod.POST, "/admin/menu/*/imagen").permitAll()
                 .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**", "/imagenes/**", "/meseros/disponibles", "/admin/Meseros", "/health",
                 "/empleado/pedidos", "/empleado/ventas").permitAll()
