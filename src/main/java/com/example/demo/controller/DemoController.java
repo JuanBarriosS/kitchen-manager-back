@@ -496,4 +496,15 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
             default:           return "Otro";
         }
     }
+
+    @Autowired
+    private PrediccionService prediccionService;
+    
+    @GetMapping("/admin/prediccion")
+    public ResponseEntity<?> prediccion() {
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("modeloCargado",  prediccionService.isModeloCargado());
+        resp.put("predicciones",   prediccionService.predecirAhora());
+        return ResponseEntity.ok(resp);
+    }
 }
