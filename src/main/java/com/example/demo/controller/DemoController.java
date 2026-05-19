@@ -371,7 +371,7 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
     
         List<Venta> ventas = ventaRepository.findAll();
     
-        // ── PASO 1: recolectar platos únicos con sus frecuencias ──
+        //recolectar platos con sus frecuencias 
         Map<String, Integer> frecuenciaPlatos = new LinkedHashMap<>();
         for (Venta v : ventas) {
             if (v.getItemsVendidos() == null) continue;
@@ -392,7 +392,7 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         // Lista de platos únicos para declarar el atributo nominal
         List<String> platosUnicos = new ArrayList<>(frecuenciaPlatos.keySet());
     
-        // ── PASO 2: calcular umbrales baja/media/alta ──
+        // calcular umbrales baja/media/alta ──
         // Recogemos TODAS las cantidades individuales para percentiles
         List<Integer> cantidades = new ArrayList<>();
         for (Venta v : ventas) {
@@ -410,7 +410,7 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         // Si todos son iguales evitamos que todo sea la misma clase
         if (p33 == p66) { p33 = 1; p66 = 2; }
     
-        // ── PASO 3: construir cabecera ARFF ──
+        // construir cabecera ARFF ──
         StringBuilder sb = new StringBuilder();
         sb.append("@relation demanda_platos\n\n");
     
@@ -428,11 +428,11 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         sb.append("@attribute fuente " +
             "{Presencial,Rappi,UberEats,WhatsApp,DiDiFood,Otro}\n");
     
-        // Clase — lo que queremos predecir
+        
         sb.append("@attribute demanda {baja,media,alta}\n\n");
         sb.append("@data\n");
     
-        // ── PASO 4: generar filas de datos ──
+        // generar filas de datos ──
         String[] diasNombre = {
             "Domingo","Lunes","Martes","Miercoles",
             "Jueves","Viernes","Sabado"
