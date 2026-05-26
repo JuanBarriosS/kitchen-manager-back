@@ -22,12 +22,14 @@ public class Menu {
 
     private String imagenUrl;
 
+    private String descripcion;
+    
     public Menu() {
     }
     
 
     public Menu(String id, String nombre, String categoria, String descripcion, double precio, boolean disponible,
-            int cantidad, String imagenUrl) {
+            int cantidad, String imagenUrl, String descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.categoria = categoria;
@@ -36,6 +38,7 @@ public class Menu {
         this.disponible = disponible;
         this.cantidad = cantidad;
         this.imagenUrl = imagenUrl;
+        this.descripcion = descripcion;
     }
 
     public boolean isDisponible() {
@@ -52,6 +55,14 @@ public class Menu {
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
+    }
+
+    public int getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(int desscripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getCategoria() {
