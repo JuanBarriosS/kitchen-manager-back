@@ -70,7 +70,7 @@ public class DemoController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuarios loginRequest) {
         try {
-            // validarSpring Security automaticamente si el usuario existe y la contraseña coincide
+            // validar Spring Security automaticamente si el usuario existe y la contraseña coincide
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     loginRequest.getUsername(),
@@ -78,13 +78,12 @@ public class DemoController {
                 )
             );
 
-            // Si los datos son correctos s busca al usuario para generar su token.
             Usuarios usuario = usuarioRepository.findByUsername(loginRequest.getUsername());
 
-            // generar el Token JWT usando JwtService
+            // para generar el Token JWT usando JwtService
             String jwt = jwtService.generateToken(usuario);
 
-            // respuesta para el frontend React
+            // respuesta para el frontend 
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("mensaje", "Login exitoso");
             respuesta.put("token", jwt); // token
@@ -392,8 +391,6 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         // Lista de platos únicos para declarar el atributo nominal
         List<String> platosUnicos = new ArrayList<>(frecuenciaPlatos.keySet());
     
-        // calcular umbrales baja/media/alta ──
-        // Recogemos TODAS las cantidades individuales para percentiles
         List<Integer> cantidades = new ArrayList<>();
         for (Venta v : ventas) {
             if (v.getItemsVendidos() == null) continue;
