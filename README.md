@@ -3,15 +3,14 @@
 # 🍽️ Kitchen Manager — Backend
 ### *Sistema de gestión integral para ghost kitchens*
 
+API REST que centraliza pedidos, ventas, menú, empleados y predicción de demanda con inteligencia artificial para operaciones de cocina en tiempo real.
+
 <img src="https://img.shields.io/badge/STATUS-PRODUCTION--READY-brightgreen?style=for-the-badge&logo=checkmarx"/>
 <img src="https://img.shields.io/badge/VERSION-1.0.0-blue?style=for-the-badge"/>
 <img src="https://img.shields.io/badge/JAVA-21-orange?style=for-the-badge&logo=openjdk"/>
 <img src="https://img.shields.io/badge/SPRING_BOOT-3.x-green?style=for-the-badge&logo=springboot"/>
 <img src="https://img.shields.io/badge/MONGODB-ATLAS-darkgreen?style=for-the-badge&logo=mongodb"/>
 
-
-
-API REST que centraliza pedidos, ventas, menú, empleados y predicción de demanda con inteligencia artificial para operaciones de cocina en tiempo real.
 
 </div>
 
