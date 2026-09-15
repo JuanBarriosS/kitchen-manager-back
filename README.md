@@ -103,7 +103,7 @@ mvn spring-boot:run
 
 <div align="center">
 
-**Juan Barrios · Hamlet Cuadro · José Miranda**  
+**Juan Barrios**  
 Tecnológico Comfenalco · Ingeniería de Sistemas · 2026
 
 </div>
