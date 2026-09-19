@@ -184,7 +184,7 @@ public class DemoController {
         return ResponseEntity.ok("Pedido eliminado");
     }
 
-    @PostMapping("/empleado/facturar/{pedidoId}")
+   @PostMapping("/empleado/facturar/{pedidoId}")
 public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
     return pedidoRepository.findById(pedidoId).map(pedido -> {
         Venta venta = new Venta();
@@ -199,13 +199,12 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
             mesero = "No asignado";
         }
         venta.setMeseroAsignado(mesero);
-        pedido.setFecha(LocalDateTime.now());
+        venta.setFecha(LocalDateTime.now());
         ventaRepository.save(venta);
         pedidoRepository.deleteById(pedidoId);
         return ResponseEntity.ok(venta);
     }).orElse(ResponseEntity.notFound().build());
 }
-
     @GetMapping("/empleado/ventas")
     public ResponseEntity<?> verVentas() {
         return ResponseEntity.ok(ventaRepository.findAll());
