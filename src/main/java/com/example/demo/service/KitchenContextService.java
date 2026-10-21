@@ -1,3 +1,20 @@
+package com.example.demo.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Menu;
+import com.example.demo.model.Pedido;
+import com.example.demo.model.Venta;
+import com.example.demo.repository.MenuRepository;
+import com.example.demo.repository.PedidoRepository;
+import com.example.demo.repository.VentaRepository;
+
 @Service
 public class KitchenContextService {
 
