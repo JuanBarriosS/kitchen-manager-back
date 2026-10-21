@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/admin/menu/*/imagen").permitAll()
                 .requestMatchers("/login", "/dashboard", "/clientes/**", "/seguimiento/**", "/menu/**", "/uploads/**", "/imagenes/**", "/meseros/disponibles", "/admin/Meseros", "/health",
                 "/empleado/pedidos", "/empleado/ventas").permitAll()
+                .requestMatchers("/admin/chat/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/empleado/**").hasAnyRole("ADMIN", "EMPLEADO")
                 .anyRequest().authenticated()
