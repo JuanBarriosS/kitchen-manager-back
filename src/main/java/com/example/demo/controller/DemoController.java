@@ -504,4 +504,19 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         resp.put("predicciones",   prediccionService.predecirAhora());
         return ResponseEntity.ok(resp);
     }
+
+    @RequestMapping("/admin/chat")
+    public class ChatbotController {
+    
+        @Autowired private ChatbotService chatbotService;
+    
+        @PostMapping("/ask")
+        public ResponseEntity<?> ask(@RequestBody Map<String, String> body) {
+            String pregunta = body.get("pregunta");
+            if (pregunta == null || pregunta.isBlank())
+                return ResponseEntity.badRequest().body("Falta el campo 'pregunta'");
+            String respuesta = chatbotService.preguntar(pregunta);
+            return ResponseEntity.ok(Map.of("respuesta", respuesta));
+        }
+}
 }
