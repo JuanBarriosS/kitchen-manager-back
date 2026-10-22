@@ -35,7 +35,7 @@
 	        <dependency>
 	            <groupId>org.springframework.ai</groupId>
 	            <artifactId>spring-ai-bom</artifactId>
-	            <version>1.1.5</version> <!-- Cambia esto -->
+	            <version>1.1.5</version> 
 	            <type>pom</type>
 	            <scope>import</scope>
 	        </dependency>
