@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 public class AsignacionOptimaService {
 
-    // Parámetros del modelo (constantes por ahora)
     private static final int TIEMPO_ATENCION_DEFAULT = 10;   // d_i
     private static final int TIEMPO_DISPONIBLE_DEFAULT = 30; // T_j
     private static final int MAX_MESAS_DEFAULT = 4;          // C_j
@@ -37,14 +36,18 @@ public class AsignacionOptimaService {
             prioridad[i] = minutos < 15 ? 1 : (minutos <= 30 ? 2 : 3);
         }
 
-        Variable[][] x = new Variable[n][m];
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
+        // Variables binarias x_ij
+        Variable[][] x = new Variable[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                x[i][j] = Variable.make("x_" + i + "_" + j).binary();
-                x[i][j].weight(-prioridad[i]); // MAX p_i*x_ij → peso negativo en ojAlgo
-                model.addVariable(x[i][j]);
+                // ← AQUÍ ESTÁ EL FIX: new Variable(...) en vez de Variable.make(...)
+                Variable v = new Variable("x_" + i + "_" + j);
+                v.binary();
+                // MAX p_i*x_ij  →  peso negativo en ojAlgo
+                v.weight(-prioridad[i]);
+                x[i][j] = model.addVariable(v);
             }
         }
 
