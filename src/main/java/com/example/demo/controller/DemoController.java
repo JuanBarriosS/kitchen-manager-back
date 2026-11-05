@@ -41,6 +41,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+// ═══ NUEVO: imports para el optimizador ═══
+import com.example.demo.dto.AsignacionResultado;
+import com.example.demo.service.AsignacionOptimaService;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:5173",
@@ -66,6 +69,10 @@ public class DemoController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private QrTokenRepository qrTokenRepository;
+
+    // ═══ NUEVO: servicio del modelo de Investigación de Operaciones ═══
+    @Autowired
+    private AsignacionOptimaService asignacionService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuarios loginRequest) {
@@ -255,11 +262,14 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         return ResponseEntity.ok(menuRepository.findAll());
     }
 
+    // ═══ MODIFICADO: ahora asigna mesero automáticamente con el optimizador ═══
     @PostMapping("/clientes/registrarPedido")
     public ResponseEntity<?> registrarPedidoII(@RequestBody Pedido pedido) {
         pedido.setFecha(LocalDateTime.now());
+        pedido.setEstado("recibido");
+        asignarMeseroA(pedido);
         pedidoRepository.save(pedido);
-        return ResponseEntity.ok("Pedido registrado");
+        return ResponseEntity.ok(pedido);
     }
 
     @GetMapping("/cocina/pedidos")
@@ -316,12 +326,15 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
     }
 
+    // ═══ MODIFICADO: también asigna mesero con el optimizador ═══
     @PostMapping("/menu/{token}/pedido")
     public ResponseEntity<?> pedidoDesdeQr(@PathVariable String token, @RequestBody Pedido pedido) {
         return qrTokenRepository.findByToken(token).map(qr -> {
             if (!qr.isActivo()) return ResponseEntity.status(403).body((Object)"QR inactivo");
             pedido.setFecha(LocalDateTime.now());
             pedido.setFuente("Presencial");
+            pedido.setEstado("recibido");
+            asignarMeseroA(pedido);
             pedidoRepository.save(pedido);
             return ResponseEntity.ok((Object)pedido);
         }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
@@ -505,4 +518,117 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         return ResponseEntity.ok(resp);
     }
 
+    // ════════════════════════════════════════════════════════════════
+    // NUEVO: ASIGNACIÓN ÓPTIMA DE MESEROS (Investigación de Operaciones)
+    // ════════════════════════════════════════════════════════════════
+
+    /**
+     * Asigna el mesero óptimo a un pedido usando el modelo de PL entera binaria.
+     * Si el pedido ya trae meseroAsignado (elección manual del cliente), lo respeta.
+     */
+    private void asignarMeseroA(Pedido pedido) {
+        if (pedido.getMeseroAsignado() != null && !pedido.getMeseroAsignado().isBlank()) {
+            return; // el cliente ya eligió manualmente
+        }
+
+        // Pool: pedidos activos sin mesero + el pedido nuevo (centinela)
+        List<Pedido> activos = pedidoRepository.findAll().stream()
+            .filter(p -> p.getEstado() != null)
+            .filter(p -> List.of("recibido", "preparacion", "listo").contains(p.getEstado()))
+            .filter(p -> p.getMeseroAsignado() == null || p.getMeseroAsignado().isBlank())
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        Pedido centinela = new Pedido();
+        centinela.setId("__nuevo__");
+        centinela.setFecha(pedido.getFecha());
+        activos.add(centinela);
+
+        List<String> meseros = empleadoRepository.findAll().stream()
+            .map(Empleados::getUsername)
+            .toList();
+
+        asignacionService.asignar(activos, meseros).stream()
+            .filter(a -> "__nuevo__".equals(a.pedidoId()))
+            .findFirst()
+            .ifPresent(a -> pedido.setMeseroAsignado(a.meseroNombre()));
+    }
+
+    /**
+     * Devuelve la asignación óptima actual sin aplicar cambios.
+     * Útil para dashboards y para auditar la matriz x_ij resultante.
+     */
+    @GetMapping("/asignacion/optima")
+    public ResponseEntity<?> asignacionOptima() {
+        List<Pedido> activos = pedidoRepository.findAll().stream()
+            .filter(p -> p.getEstado() != null)
+            .filter(p -> List.of("recibido", "preparacion", "listo").contains(p.getEstado()))
+            .filter(p -> p.getMeseroAsignado() == null || p.getMeseroAsignado().isBlank())
+            .toList();
+
+        List<String> meseros = empleadoRepository.findAll().stream()
+            .map(Empleados::getUsername)
+            .toList();
+
+        return ResponseEntity.ok(asignacionService.asignar(activos, meseros));
+    }
+
+    /**
+     * Sugiere el mesero que el optimizador asignaría a un pedido NUEVO
+     * (sin crearlo todavía). Lo usa PortalClientes.jsx para mostrar
+     * "Mesero asignado por optimización" antes de enviar.
+     */
+    @GetMapping("/asignacion/sugerir")
+    public ResponseEntity<?> sugerirMesero() {
+        List<Pedido> activos = pedidoRepository.findAll().stream()
+            .filter(p -> p.getEstado() != null)
+            .filter(p -> List.of("recibido", "preparacion", "listo").contains(p.getEstado()))
+            .filter(p -> p.getMeseroAsignado() == null || p.getMeseroAsignado().isBlank())
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        Pedido simulado = new Pedido();
+        simulado.setId("__nuevo__");
+        simulado.setFecha(LocalDateTime.now());
+        activos.add(simulado);
+
+        List<String> meseros = empleadoRepository.findAll().stream()
+            .map(Empleados::getUsername)
+            .toList();
+
+        return asignacionService.asignar(activos, meseros).stream()
+            .filter(a -> "__nuevo__".equals(a.pedidoId()))
+            .findFirst()
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.noContent().build());
+    }
+
+    /**
+     * Aplica la asignación óptima a TODOS los pedidos activos sin mesero.
+     * Botón para el admin o invocación manual.
+     */
+    @PostMapping("/admin/asignacion/aplicar")
+    public ResponseEntity<?> aplicarAsignacion() {
+        List<Pedido> activos = pedidoRepository.findAll().stream()
+            .filter(p -> p.getEstado() != null)
+            .filter(p -> List.of("recibido", "preparacion", "listo").contains(p.getEstado()))
+            .filter(p -> p.getMeseroAsignado() == null || p.getMeseroAsignado().isBlank())
+            .toList();
+
+        List<String> meseros = empleadoRepository.findAll().stream()
+            .map(Empleados::getUsername)
+            .toList();
+
+        List<AsignacionResultado> asignaciones = asignacionService.asignar(activos, meseros);
+        asignaciones.forEach(a ->
+            pedidoRepository.findById(a.pedidoId()).ifPresent(p -> {
+                p.setMeseroAsignado(a.meseroNombre());
+                pedidoRepository.save(p);
+            })
+        );
+
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("asignados", asignaciones.size());
+        resp.put("pendientes", activos.size() - asignaciones.size());
+        resp.put("detalle", asignaciones);
+        return ResponseEntity.ok(resp);
+    }
 }
