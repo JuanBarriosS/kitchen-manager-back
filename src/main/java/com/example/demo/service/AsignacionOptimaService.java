@@ -37,22 +37,21 @@ public class AsignacionOptimaService {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
+        // Crear las variables
         Variable[][] x = new Variable[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                Variable v = new Variable("x_" + i + "_" + j);
-                v.binary();
-                v.weight(-prioridad[i]);
-                model.addVariable(v);
-                x[i][j] = v;
+                x[i][j] = model.newVariable("x_" + i + "_" + j).binary().weight(-prioridad[i]);
             }
         }
 
+        // R1: cada mesa a lo sumo un mesero
         for (int i = 0; i < n; i++) {
             var r1 = model.addExpression("R1_" + i).upper(1);
             for (int j = 0; j < m; j++) r1.set(x[i][j], 1);
         }
 
+        // R2 + R3: capacidad de cada mesero
         for (int j = 0; j < m; j++) {
             var r2 = model.addExpression("R2_" + j).upper(TIEMPO_DISPONIBLE_DEFAULT);
             var r3 = model.addExpression("R3_" + j).upper(MAX_MESAS_DEFAULT);
