@@ -577,34 +577,47 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
      * (sin crearlo todavía). Lo usa PortalClientes.jsx para mostrar
      * "Mesero asignado por optimización" antes de enviar.
      */
-    @GetMapping("/asignacion/sugerir")
+       @GetMapping("/asignacion/sugerir")
     public ResponseEntity<?> sugerirMesero() {
+        // 1. Traer todos los pedidos activos que NO tengan mesero
         List<Pedido> activos = pedidoRepository.findAll().stream()
             .filter(p -> p.getEstado() != null)
             .filter(p -> List.of("recibido", "preparacion", "listo").contains(p.getEstado()))
             .filter(p -> p.getMeseroAsignado() == null || p.getMeseroAsignado().isBlank())
             .collect(Collectors.toCollection(ArrayList::new));
 
+        // 2. Traer TODOS los meseros (como dices, todos están en turno)
+        List<String> meseros = empleadoRepository.findAll().stream()
+            .map(Empleados::getUsername)
+            .toList();
+
+        // Si no hay meseros en la base de datos, devolvemos vacío
+        if (meseros.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // 3. Crear un pedido simulado (el que se está armando en el front)
         Pedido simulado = new Pedido();
         simulado.setId("__nuevo__");
         simulado.setFecha(LocalDateTime.now());
         activos.add(simulado);
 
-        List<String> meseros = empleadoRepository.findAll().stream()
-            .map(Empleados::getUsername)
-            .toList();
+        // 4. Ejecutar el modelo
+        List<AsignacionResultado> resultados = asignacionService.asignar(activos, meseros);
 
-        return asignacionService.asignar(activos, meseros).stream()
+        // 5. Buscar la asignación de nuestro pedido simulado
+        return resultados.stream()
             .filter(a -> "__nuevo__".equals(a.pedidoId()))
             .findFirst()
             .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.noContent().build());
+            .orElseGet(() -> {
+                // SI EL MODELO FALLA, ASIGNAMOS AL PRIMER MESERO POR DEFECTO
+                // (Esto es un parche de seguridad para que el frontend nunca se quede colgado)
+                AsignacionResultado fallback = new AsignacionResultado("__nuevo__", meseros.get(0), 1);
+                return ResponseEntity.ok(fallback);
+            });
     }
-
-    /**
-     * Aplica la asignación óptima a TODOS los pedidos activos sin mesero.
-     * Botón para el admin o invocación manual.
-     */
+    
     @PostMapping("/admin/asignacion/aplicar")
     public ResponseEntity<?> aplicarAsignacion() {
         List<Pedido> activos = pedidoRepository.findAll().stream()
