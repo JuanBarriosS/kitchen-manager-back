@@ -15,9 +15,9 @@ import java.util.List;
 @Service
 public class AsignacionOptimaService {
 
-    private static final int TIEMPO_ATENCION_DEFAULT = 10;   // d_i
-    private static final int TIEMPO_DISPONIBLE_DEFAULT = 30; // T_j
-    private static final int MAX_MESAS_DEFAULT = 4;          // C_j
+    private static final int TIEMPO_ATENCION_DEFAULT = 10;
+    private static final int TIEMPO_DISPONIBLE_DEFAULT = 30;
+    private static final int MAX_MESAS_DEFAULT = 4;
 
     public List<AsignacionResultado> asignar(List<Pedido> pedidosActivos,
                                              List<String> nombresMeseros) {
@@ -28,7 +28,6 @@ public class AsignacionOptimaService {
 
         LocalDateTime ahora = LocalDateTime.now();
 
-        // p_i según tiempo de espera w_i
         int[] prioridad = new int[n];
         for (int i = 0; i < n; i++) {
             LocalDateTime fecha = pedidosActivos.get(i).getFecha();
@@ -38,26 +37,22 @@ public class AsignacionOptimaService {
 
         ExpressionsBasedModel model = new ExpressionsBasedModel();
 
-        // Variables binarias x_ij
         Variable[][] x = new Variable[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                // ← AQUÍ ESTÁ EL FIX: new Variable(...) en vez de Variable.make(...)
                 Variable v = new Variable("x_" + i + "_" + j);
                 v.binary();
-                // MAX p_i*x_ij  →  peso negativo en ojAlgo
                 v.weight(-prioridad[i]);
-                x[i][j] = model.addVariable(v);
+                model.addVariable(v);
+                x[i][j] = v;
             }
         }
 
-        // R1: cada mesa a lo sumo un mesero
         for (int i = 0; i < n; i++) {
             var r1 = model.addExpression("R1_" + i).upper(1);
             for (int j = 0; j < m; j++) r1.set(x[i][j], 1);
         }
 
-        // R2 + R3: capacidad de cada mesero
         for (int j = 0; j < m; j++) {
             var r2 = model.addExpression("R2_" + j).upper(TIEMPO_DISPONIBLE_DEFAULT);
             var r3 = model.addExpression("R3_" + j).upper(MAX_MESAS_DEFAULT);
