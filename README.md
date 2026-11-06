@@ -99,6 +99,16 @@ mvn spring-boot:run
 | Backend | `https://kitchen-manager-back.onrender.com` |
 | Frontend | `https://kitchen-manager-front.vercel.app` |
 
+
+## Credenciales para ver la demo
+Administradr
+user:admin
+pwd:1234
+-----------
+Empleado
+user:empleado
+pwd:1234
+
 ---
 
 <div align="center">
