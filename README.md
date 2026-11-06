@@ -109,7 +109,7 @@ pwd:1234
 
 Administrador
 user:admin
-empleado:1234
+pwd:1234
 
 ---
 
