@@ -101,13 +101,15 @@ mvn spring-boot:run
 
 
 ## Credenciales para ver la demo
-Administradr
-user:admin
-pwd:1234
+
 -----------
 Empleado
 user:empleado
 pwd:1234
+
+Administrador
+user:admin
+empleado:1234
 
 ---
 
