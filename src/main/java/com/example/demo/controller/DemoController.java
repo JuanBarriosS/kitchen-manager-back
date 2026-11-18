@@ -40,7 +40,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
+import com.example.demo.service.ChatbotService;
 // ═══ NUEVO: imports para el optimizador ═══
 import com.example.demo.dto.AsignacionResultado;
 import com.example.demo.service.AsignacionOptimaService;
