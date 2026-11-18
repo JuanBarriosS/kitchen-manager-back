@@ -69,4 +69,19 @@ public class KitchenContextService {
 
         return ctx.toString();
     }
+
+        public String construirContextoMenu() {
+        StringBuilder ctx = new StringBuilder("MENÚ DISPONIBLE:\n");
+        menuRepository.findAll().stream()
+            .filter(Menu::isDisponible)
+            .forEach(p -> {
+                ctx.append("- ").append(p.getNombre())
+                   .append(" | ").append(p.getCategoria())
+                   .append(" | $").append(p.getPrecio());
+                if (p.getDescripcion() != null && !p.getDescripcion().isBlank())
+                    ctx.append(" | lleva: ").append(p.getDescripcion());
+                ctx.append("\n");
+            });
+        return ctx.toString();
+    }
 }
