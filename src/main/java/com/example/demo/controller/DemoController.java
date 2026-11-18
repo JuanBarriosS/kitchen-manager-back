@@ -340,6 +340,21 @@ public ResponseEntity<?> facturar(@PathVariable String pedidoId) {
         }).orElse(ResponseEntity.status(404).body((Object)"QR no encontrado"));
     }
 
+    @Autowired private ChatbotService chatbotService;
+
+    @PostMapping("/menu/{token}/chat")
+    public ResponseEntity<?> chatCliente(@PathVariable String token, @RequestBody Map<String, String> body) {
+        var qr = qrTokenRepository.findByToken(token);
+        if (qr.isEmpty() || !qr.get().isActivo())
+            return ResponseEntity.status(403).body("QR inactivo");
+    
+        String pregunta = body.get("pregunta");
+        if (pregunta == null || pregunta.isBlank() || pregunta.length() > 300)
+            return ResponseEntity.badRequest().body("Pregunta inválida");
+    
+        return ResponseEntity.ok(Map.of("respuesta", chatbotService.preguntarCliente(pregunta)));
+    }
+
     @PostMapping("/admin/upload")
     public ResponseEntity<?> subirImagen(@RequestParam("file") MultipartFile file) {
         try {
