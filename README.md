@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center"> hola
 
 # 🍽️ Kitchen Manager — Backend
 ### *Sistema de gestión integral para ghost kitchens*
