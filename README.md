@@ -115,7 +115,7 @@ pwd:1234
 
 <div align="center">
 
-**Juan Barrios**  
+**Juan Barrios - Hamlet Cuadro - Jose Miranda**  
 Tecnológico Comfenalco · Ingeniería de Sistemas · 2026
 
 </div>
